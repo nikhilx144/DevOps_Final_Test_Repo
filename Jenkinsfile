@@ -41,9 +41,11 @@ pipeline {
                 sh '''
                     apt-get update && apt-get install -y unzip
                     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                    unzip -o awscliv2.zip  # The -o flag forces overwrite without asking
-                    ./aws/install
-                    rm -rf aws awscliv2.zip # Clean up the installer files
+                    unzip -o awscliv2.zip
+                    # The --update flag tells the installer to overwrite the existing installation
+                    ./aws/install --update
+                    # Clean up the installer files so the workspace is fresh for the next run
+                    rm -rf aws awscliv2.zip
                 '''
                 withAWS(credentials: 'aws-credentials', region: AWS_REGION) {
                     sh "docker build -t ${ECR_REPO_URI}:${BUILD_NUMBER} ."
