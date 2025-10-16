@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        terraform 'terraform-latest'
+    }
+
     environment {
         AWS_REGION = 'ap-south-2'
         AWS_ACCOUNT_ID = '661979762009'
