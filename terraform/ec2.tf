@@ -28,12 +28,17 @@ resource "aws_security_group" "web_sg" {
   }
 }
 
+resource "aws_key_pair" "deployer_key" {
+    key_name   = "test-ec2"
+    public_key = file("~/.ssh/id_rsa.pub")
+}
+
 resource "aws_instance" "web_server" {
   ami = var.ami_id
   instance_type = var.instance_type
   
   # Attach the key pair and security group
-  key_name = var.key_name
+  key_name = aws_key_pair.deployer_key
   vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   # This script runs on instance start-up to install Docker

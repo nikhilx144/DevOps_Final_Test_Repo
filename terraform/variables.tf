@@ -12,8 +12,3 @@ variable "ami_id" {
     description = "EC2 Instance AMI ID"
     type = string
 }
-
-variable "key_name" {
-    description = "AWS Key Pair"
-    type = string
-}
