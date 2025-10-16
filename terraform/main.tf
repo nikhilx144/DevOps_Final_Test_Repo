@@ -30,7 +30,7 @@ resource "aws_security_group" "web_sg" {
 
 resource "aws_key_pair" "deployer_key" {
     key_name   = "test-ec2"
-    public_key = file("~/.ssh/id_rsa.pub")
+    public_key = file("${path.module}/id_rsa.pub")
 }
 
 resource "aws_instance" "web_server" {
