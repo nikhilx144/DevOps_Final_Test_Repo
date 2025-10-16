@@ -29,7 +29,7 @@ pipeline {
                         sh 'terraform apply -auto-approve'
                         // Get the public IP output from Terraform and save it as a variable
                         script {
-                            env.EC2_PUBLIC_IP = sh(returnStdout: true, script: 'terraform output -raw instance_public_ip').trim()
+                            env.EC2_PUBLIC_IP = sh(returnStdout: true, script: 'terraform output -raw ec2_public_ip').trim()
                         }
                     }
                 }
