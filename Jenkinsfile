@@ -55,29 +55,6 @@ pipeline {
             }
         }
 
-        // stage('Build and Push Docker Image') {
-        //     steps {
-        //         sh '''
-        //             apt-get update
-        //             apt-get install -y unzip
-        //             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        //             unzip awscliv2.zip
-        //             ./aws/install
-        //         '''
-
-        //         withAWS(credentials: 'aws-credentials', region: AWS_REGION) {
-        //             // Build the Docker image, tagging it with the build number
-        //             sh "docker build -t ${ECR_REPO_URI}:${BUILD_NUMBER} ."
-                    
-        //             // Log in to ECR
-        //             sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO_URI}"
-
-        //             // Push the image to ECR
-        //             sh "docker push ${ECR_REPO_URI}:${BUILD_NUMBER}"
-        //         }
-        //     }
-        // }
-        
         stage('Deploy to EC2') {
             steps {
                 // Use the SSH key stored in Jenkins to connect to the EC2 instance
