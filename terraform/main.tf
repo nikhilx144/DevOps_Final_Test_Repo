@@ -36,7 +36,8 @@ resource "aws_key_pair" "deployer_key" {
 resource "aws_instance" "web_server" {
   ami = var.ami_id
   instance_type = var.instance_type
-  
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
   # Attach the key pair and security group
   key_name = aws_key_pair.deployer_key.key_name
   vpc_security_group_ids = [aws_security_group.web_sg.id]
@@ -44,13 +45,44 @@ resource "aws_instance" "web_server" {
   # This script runs on instance start-up to install Docker
   user_data = <<-EOF
               #!/bin/bash
-              sudo yum update -y
-              sudo yum install -y docker
-              sudo service docker start
+              sudo dnf update -y
+              sudo dnf install -y docker
+              sudo systemctl start docker
+              sudo systemctl enable docker
               sudo usermod -a -G docker ec2-user
               EOF
 
   tags = {
     Name = "WebAppServerDevOpsFinalPrac"
   }
+}
+
+# IAM Role that allows the EC2 service to assume it
+resource "aws_iam_role" "ec2_role" {
+  name = "ec2-ecr-access-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# Attaches the AWS-managed policy for ECR read-only access to the role
+resource "aws_iam_role_policy_attachment" "ecr_read_only" {
+  role = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+# Creates an instance profile to attach the role to an EC2 instance
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "ec2-ecr-access-profile"
+  role = aws_iam_role.ec2_role.name
 }
