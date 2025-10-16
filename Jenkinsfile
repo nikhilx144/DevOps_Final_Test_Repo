@@ -21,14 +21,16 @@ pipeline {
 
         stage('Terraform Apply') {
             steps {
-                // Use the AWS credentials stored in Jenkins
-                withAWS(credentials: 'aws-credentials', region: AWS_REGION) {
-                    // Initialize Terraform and apply the configuration
-                    sh 'terraform init'
-                    sh 'terraform apply -auto-approve'
-                    // Get the public IP output from Terraform and save it as a variable
-                    script {
-                        env.EC2_PUBLIC_IP = sh(returnStdout: true, script: 'terraform output -raw instance_public_ip').trim()
+                dir('terraform') {
+                    // Use the AWS credentials stored in Jenkins
+                    withAWS(credentials: 'aws-credentials', region: AWS_REGION) {
+                        // Initialize Terraform and apply the configuration
+                        sh 'terraform init'
+                        sh 'terraform apply -auto-approve'
+                        // Get the public IP output from Terraform and save it as a variable
+                        script {
+                            env.EC2_PUBLIC_IP = sh(returnStdout: true, script: 'terraform output -raw instance_public_ip').trim()
+                        }
                     }
                 }
             }
